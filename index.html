@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxo do Sistema — Aprendizagem Jovem</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --bg: #0e0f14; --surface: #161820; --surface2: #1e2029; --border: #2a2d3a;
+    --text: #e8eaf0; --muted: #6b7080;
+    --centro: #4d9fff; --entidade: #3ddba0; --empresa: #f0b429;
+    --jovem: #a78bfa; --sistema: #f472b6;
+    --amber: #f0b429; --red: #f06060; --green: #3ddba0; --blue: #4d9fff;
+    --gray: #6b7080; --orange: #fb923c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 24px 80px; }
+
+  header { text-align: center; margin-bottom: 48px; }
+  header h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; }
+  header p { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: center; margin-bottom: 48px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: var(--muted); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  .section-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-left: 2px; }
+
+  .flow-wrapper { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; }
+
+  .phase { margin-bottom: 6px; }
+  .phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .phase-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); min-width: 24px; }
+  .phase-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .phase-line { flex: 1; height: 1px; background: var(--border); }
+
+  .steps-row { display: flex; gap: 10px; padding-left: 36px; flex-wrap: wrap; }
+
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; min-width: 190px; max-width: 290px; flex: 1; transition: border-color 0.2s, transform 0.2s; cursor: default; }
+  .step:hover { transform: translateY(-2px); }
+  .step-actor { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 5px; }
+  .step-title { font-size: 0.88rem; font-weight: 500; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
+  .step-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .tag { display: inline-block; font-size: 0.63rem; font-family: 'DM Mono', monospace; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.03em; }
+  .tag-auto  { background: color-mix(in srgb, var(--sistema) 15%, transparent); color: var(--sistema); }
+  .tag-wp    { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green); }
+  .tag-web   { background: color-mix(in srgb, var(--blue) 15%, transparent); color: var(--blue); }
+  .tag-email { background: color-mix(in srgb, var(--jovem) 15%, transparent); color: var(--jovem); }
+  .tag-tel   { background: color-mix(in srgb, var(--amber) 15%, transparent); color: var(--amber); }
+  .tag-pres  { background: color-mix(in srgb, #94a3b8 15%, transparent); color: #94a3b8; }
+  .tag-ia    { background: color-mix(in srgb, var(--sistema) 20%, transparent); color: var(--sistema); }
+
+  .actor-centro   { color: var(--centro);   }
+  .actor-entidade { color: var(--entidade); }
+  .actor-empresa  { color: var(--empresa);  }
+  .actor-jovem    { color: var(--jovem);    }
+  .actor-sistema  { color: var(--sistema);  }
+
+  .step.actor-centro   { border-color: color-mix(in srgb, var(--centro) 25%, var(--border)); }
+  .step.actor-centro:hover   { border-color: var(--centro); }
+  .step.actor-entidade { border-color: color-mix(in srgb, var(--entidade) 25%, var(--border)); }
+  .step.actor-entidade:hover { border-color: var(--entidade); }
+  .step.actor-empresa  { border-color: color-mix(in srgb, var(--empresa) 25%, var(--border)); }
+  .step.actor-empresa:hover  { border-color: var(--empresa); }
+  .step.actor-jovem    { border-color: color-mix(in srgb, var(--jovem) 25%, var(--border)); }
+  .step.actor-jovem:hover    { border-color: var(--jovem); }
+  .step.actor-sistema  { border-color: color-mix(in srgb, var(--sistema) 25%, var(--border)); }
+  .step.actor-sistema:hover  { border-color: var(--sistema); }
+
+  .note { background: color-mix(in srgb, var(--amber) 8%, var(--surface2)); border-left: 3px solid var(--amber); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.76rem; color: var(--muted); line-height: 1.5; margin-top: 10px; margin-left: 36px; }
+  .note strong { color: var(--amber); font-weight: 500; }
+
+  .phase-arrow { padding-left: 44px; margin: 4px 0 8px; }
+  .phase-arrow::before { content: ''; display: block; width: 1px; height: 28px; background: linear-gradient(to bottom, var(--border), transparent); }
+
+  /* STATUS */
+  .status-section { max-width: 900px; margin: 44px auto 0; }
+  .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .status-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .status-badge { display: inline-block; font-size: 0.67rem; font-family: 'DM Mono', monospace; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-bottom: 7px; letter-spacing: 0.04em; }
+  .s-espera   { background: color-mix(in srgb, var(--gray) 20%, transparent);   color: var(--gray);   }
+  .s-pre      { background: color-mix(in srgb, var(--blue) 20%, transparent);   color: var(--blue);   }
+  .s-aprendiz { background: color-mix(in srgb, var(--green) 20%, transparent);  color: var(--green);  }
+  .s-abandono { background: color-mix(in srgb, var(--orange) 20%, transparent); color: var(--orange); }
+  .s-removido { background: color-mix(in srgb, var(--red) 20%, transparent);    color: var(--red);    }
+  .st-title { font-size: 0.82rem; font-weight: 500; margin-bottom: 4px; }
+  .st-desc  { font-size: 0.74rem; color: var(--muted); line-height: 1.45; }
+  .st-trigger { font-size: 0.68rem; color: var(--sistema); margin-top: 6px; font-style: italic; }
+  .trans-note { font-size: 0.76rem; color: var(--muted); line-height: 1.6; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }
+  .trans-note strong { color: var(--text); font-weight: 500; }
+
+  /* CANAIS */
+  .canais-section { max-width: 900px; margin: 44px auto 0; }
+  .canais-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .canal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .canal-icon { font-size: 1.3rem; margin-bottom: 8px; }
+  .canal-name { font-size: 0.84rem; font-weight: 600; margin-bottom: 4px; }
+  .canal-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.5; }
+  .canal-uso  { font-size: 0.68rem; font-family: 'DM Mono', monospace; color: var(--sistema); margin-top: 7px; }
+
+  /* REGRAS */
+  .regras-section { max-width: 900px; margin: 44px auto 0; }
+  .regras-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .regra-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .regra-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 10px; }
+  .regra-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .regra-list li { font-size: 0.75rem; color: var(--muted); padding-left: 14px; position: relative; line-height: 1.5; }
+  .regra-list li::before { content: '·'; position: absolute; left: 0; }
+
+  /* PERFIS */
+  .perfis-section { max-width: 900px; margin: 44px auto 0; }
+  .perfis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .perfil-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .perfil-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
+  .perfil-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .perfil-list li { font-size: 0.73rem; color: var(--muted); padding-left: 14px; position: relative; line-height: 1.4; }
+  .perfil-list li::before { content: '✓'; position: absolute; left: 0; font-size: 0.6rem; top: 2px; }
+  .perfil-list li.deny::before { content: '✗'; color: var(--red); }
+  .perfil-list li.deny { color: color-mix(in srgb, var(--red) 60%, var(--muted)); }
+
+  /* OPEN POINTS */
+  .obs-box { max-width: 900px; margin: 40px auto 0; background: color-mix(in srgb, var(--amber) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--amber) 30%, var(--border)); border-radius: 10px; padding: 16px 20px; }
+  .obs-title { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; }
+  .obs-box ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .obs-box li { font-size: 0.78rem; color: var(--muted); padding-left: 14px; position: relative; line-height: 1.5; }
+  .obs-box li::before { content: '·'; position: absolute; left: 0; color: var(--amber); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sistema de Aprendizagem Jovem</h1>
+  <p>Fluxo operacional · versão 1.2</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--centro)"></div> Centro de Cadastro</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--entidade)"></div> Entidade Formadora</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--empresa)"></div> Empresa</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--jovem)"></div> Jovem</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--sistema)"></div> Sistema (automático)</div>
+</div>
+
+<!-- FLUXO -->
+<div class="flow-wrapper">
+
+  <!-- 00 -->
+  <div class="phase">
+    <div class="phase-header"><span class="phase-num">00</span><span class="phase-title">Iniciativa / Chegada</span><div class="phase-line"></div></div>
+    <div class="steps-row">
+      <div class="step actor-jovem">
+        <div class="step-actor actor-jovem">Jovem / Família</div>
+        <div class="step-title">Procura o CREAS</div>
+        <div class="step-desc">Família ou jovem busca o serviço de assistência social. Primeiro contato com o programa.</div>
+      </div>
+    </div>
+  </div>
+  <div class="phase-arrow"></div>
+
+  <!-- 01 -->
+  <div class="phase">
+    <div class="phase-header"><span class="phase-num">01</span><span class="phase-title">Cadastro do Jovem</span><div class="phase-line"></div></div>
+    <div class="steps-row">
+      <div class="step actor-centro">
+        <div class="step-actor actor-centro">Centro de Cadastro</div>
+        <div class="step-title">Cadastra o jovem no sistema</div>
+        <div class="step-desc">Técnico insere os dados do jovem. Pode receber informações do jovem via WhatsApp (áudio processado por IA ou texto) ou inserir diretamente na plataforma.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span><span class="tag tag-wp">whatsapp</span></div>
+      </div>
+      <div class="step actor-sistema">
+        <div class="step-actor actor-sistema">Sistema</div>
+        <div class="step-title">Status inicial: ESPERA</div>
+        <div class="step-desc">Jovem entra no sistema aguardando encaminhamento. Status atribuído automaticamente.</div>
+        <div class="tags"><span class="tag tag-auto">automático</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="phase-arrow"></div>
+
+  <!-- 02 -->
+  <div class="phase">
+    <div class="phase-header"><span class="phase-num">02</span><span class="phase-title">Distribuição de Vagas por Hierarquia</span><div class="phase-line"></div></div>
+    <div class="steps-row">
+      <div class="step actor-empresa">
+        <div class="step-actor actor-empresa">Empresa</div>
+        <div class="step-title">Oferta vagas no sistema</div>
+        <div class="step-desc">Empresa registra vagas disponíveis. Não tem acesso à lista de jovens nem participa da seleção.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span></div>
+      </div>
+      <div class="step actor-centro">
+        <div class="step-actor actor-centro">Centro de Cadastro</div>
+        <div class="step-title">Distribui vagas conforme hierarquia</div>
+        <div class="step-desc">Técnico aloca as vagas manualmente respeitando a hierarquia fixa entre os centros. Centro de maior prioridade recebe mais vagas. Ex: 4 vagas → 3 para o centro A, 1 para o B.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span></div>
+      </div>
+    </div>
+    <div class="note"><strong>Hierarquia:</strong> fixa e pré-definida entre os centros. Distribuição realizada manualmente pelo técnico.</div>
+  </div>
+  <div class="phase-arrow"></div>
+
+  <!-- 03 -->
+  <div class="phase">
+    <div class="phase-header"><span class="phase-num">03</span><span class="phase-title">Seleção e Match</span><div class="phase-line"></div></div>
+    <div class="steps-row">
+      <div class="step actor-centro">
+        <div class="step-actor actor-centro">Centro de Cadastro</div>
+        <div class="step-title">Seleciona jovens e faz o match</div>
+        <div class="step-desc">Técnico analisa os jovens em espera e os encaminha para entidade formadora ou empresa, respeitando os critérios do programa.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span></div>
+      </div>
+      <div class="step actor-sistema">
+        <div class="step-actor actor-sistema">Sistema</div>
+        <div class="step-title">Atualiza status automaticamente</div>
+        <div class="step-desc">Vínculo com entidade formadora → PRÉ-APRENDIZAGEM. Vínculo com empresa → APRENDIZAGEM.</div>
+        <div class="tags"><span class="tag tag-auto">automático</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="phase-arrow"></div>
+
+  <!-- 04 -->
+  <div class="phase">
+    <div class="phase-header"><span class="phase-num">04</span><span class="phase-title">Pré-aprendizagem (Entidade Formadora)</span><div class="phase-line"></div></div>
+    <div class="steps-row">
+      <div class="step actor-entidade">
+        <div class="step-actor actor-entidade">Entidade Formadora</div>
+        <div class="step-title">Acompanha o jovem em curso</div>
+        <div class="step-desc">Atualiza informações e registra evolução via plataforma web ou envia ao centro pelo WhatsApp, e-mail ou telefone. Segue as políticas da entidade e critérios do programa.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span><span class="tag tag-wp">whatsapp</span><span class="tag tag-email">e-mail</span><span class="tag tag-tel">telefone</span></div>
+      </div>
+      <div class="step actor-centro">
+        <div class="step-actor actor-centro">Centro de Cadastro</div>
+        <div class="step-title">Coleta e registra informações</div>
+        <div class="step-desc">Técnico entra em contato com a entidade (WhatsApp, e-mail ou telefone) ou recebe as informações proativamente. Insere dados no sistema via plataforma web.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span><span class="tag tag-wp">whatsapp</span><span class="tag tag-email">e-mail</span><span class="tag tag-tel">telefone</span></div>
+      </div>
+      <div class="step actor-jovem">
+        <div class="step-actor actor-jovem">Jovem</div>
+        <div class="step-title">Envia informações</div>
+        <div class="step-desc">Jovem se comunica via WhatsApp — texto ou áudio. Áudios são processados automaticamente por IA antes de serem registrados.</div>
+        <div class="tags"><span class="tag tag-wp">whatsapp</span><span class="tag tag-ia">IA — transcrição de áudio</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="phase-arrow"></div>
+
+  <!-- 05 -->
+  <div class="phase">
+    <div class="phase-header"><span class="phase-num">05</span><span class="phase-title">Aprendizagem (Empresa)</span><div class="phase-line"></div></div>
+    <div class="steps-row">
+      <div class="step actor-empresa">
+        <div class="step-actor actor-empresa">Empresa</div>
+        <div class="step-title">Acompanha o jovem em serviço</div>
+        <div class="step-desc">Responsável insere ou atualiza informações sobre os jovens vinculados, seguindo as políticas da empresa e os critérios do programa.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span><span class="tag tag-wp">whatsapp</span><span class="tag tag-email">e-mail</span><span class="tag tag-tel">telefone</span></div>
+      </div>
+      <div class="step actor-centro">
+        <div class="step-actor actor-centro">Centro de Cadastro</div>
+        <div class="step-title">Supervisão e registro</div>
+        <div class="step-desc">Técnico coleta informações junto à empresa pelos canais disponíveis e registra no sistema. Único ator que pode alterar status do jovem manualmente.</div>
+        <div class="tags"><span class="tag tag-web">plataforma web</span><span class="tag tag-wp">whatsapp</span><span class="tag tag-email">e-mail</span><span class="tag tag-tel">telefone</span></div>
+      </div>
+      <div class="step actor-entidade">
+        <div class="step-actor actor-entidade">Entidade Formadora</div>
+        <div class="step-title">Supervisão contínua</div>
+        <div class="step-desc">Mantém acompanhamento do jovem mesmo durante o período na empresa. Comunica-se com o centro pelos canais estabelecidos.</div>
+        <div class="tags"><span class="tag tag-wp">whatsapp</span><span class="tag tag-email">e-mail</span><span class="tag tag-tel">telefone</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- STATUS -->
+<div class="status-section">
+  <div class="section-label">Estados do jovem — qualquer transição é possível</div>
+  <div class="status-grid">
+    <div class="status-card">
+      <div><span class="status-badge s-espera">ESPERA</span></div>
+      <div class="st-title">Aguardando</div>
+      <div class="st-desc">Cadastrado, sem vínculo ativo. Aguarda match com vaga.</div>
+      <div class="st-trigger">↳ automático ao cadastrar</div>
+    </div>
+    <div class="status-card">
+      <div><span class="status-badge s-pre">PRÉ-APRENDIZAGEM</span></div>
+      <div class="st-title">Em curso / formação</div>
+      <div class="st-desc">Vinculado a uma entidade formadora. Em preparação.</div>
+      <div class="st-trigger">↳ automático ao vincular entidade</div>
+    </div>
+    <div class="status-card">
+      <div><span class="status-badge s-aprendiz">APRENDIZAGEM</span></div>
+      <div class="st-title">Em serviço</div>
+      <div class="st-desc">Vinculado a uma empresa em contrato ativo.</div>
+      <div class="st-trigger">↳ automático ao vincular empresa</div>
+    </div>
+    <div class="status-card">
+      <div><span class="status-badge s-abandono">ABANDONO</span></div>
+      <div class="st-title">Saída voluntária</div>
+      <div class="st-desc">Jovem saiu do programa por conta própria.</div>
+      <div class="st-trigger">↳ manual — somente centro</div>
+    </div>
+    <div class="status-card">
+      <div><span class="status-badge s-removido">REMOVIDO</span></div>
+      <div class="st-title">Desligamento institucional</div>
+      <div class="st-desc">Jovem removido por decisão institucional.</div>
+      <div class="st-trigger">↳ manual — somente centro</div>
+    </div>
+  </div>
+  <div class="trans-note">
+    <strong>Transições:</strong> qualquer status pode ir para qualquer outro (ex: ABANDONO → ESPERA para reingresso). Transições automáticas ocorrem por evento de vínculo. Alterações manuais são exclusivas do <strong>Centro de Cadastro</strong>.
+  </div>
+</div>
+
+<!-- CANAIS -->
+<div class="canais-section">
+  <div class="section-label">Canais de comunicação e inserção de dados</div>
+  <div class="canais-grid">
+    <div class="canal-card">
+      <div class="canal-icon">💬</div>
+      <div class="canal-name">WhatsApp</div>
+      <div class="canal-desc">Comunicação entre centro, entidade, empresa e jovem. Áudios processados por IA (transcrição automática). Textos registrados diretamente.</div>
+      <div class="canal-uso">inserção de dados ✓</div>
+    </div>
+    <div class="canal-card">
+      <div class="canal-icon">🖥️</div>
+      <div class="canal-name">Plataforma Web</div>
+      <div class="canal-desc">Canal principal de inserção de dados. Acesso completo para técnicos do centro, entidades e empresas conforme seus escopos.</div>
+      <div class="canal-uso">inserção de dados ✓</div>
+    </div>
+    <div class="canal-card">
+      <div class="canal-icon">✉️</div>
+      <div class="canal-name">E-mail</div>
+      <div class="canal-desc">Canal de comunicação entre centro, entidades e empresas. Usado para envio de documentos, atualizações formais e comunicados.</div>
+      <div class="canal-uso">comunicação — não insere dados diretamente</div>
+    </div>
+    <div class="canal-card">
+      <div class="canal-icon">📞</div>
+      <div class="canal-name">Telefone</div>
+      <div class="canal-desc">Canal de comunicação verbal entre técnico do centro, entidades e empresas. Informações coletadas por telefone são inseridas no sistema pelo técnico.</div>
+      <div class="canal-uso">comunicação — não insere dados diretamente</div>
+    </div>
+    <div class="canal-card">
+      <div class="canal-icon">🤖</div>
+      <div class="canal-name">IA — Transcrição de Áudio</div>
+      <div class="canal-desc">Áudios enviados via WhatsApp por jovens ou técnicos são automaticamente transcritos por IA e encaminhados para registro no sistema.</div>
+      <div class="canal-uso">processamento automático</div>
+    </div>
+  </div>
+</div>
+
+<!-- REGRAS -->
+<div class="regras-section">
+  <div class="section-label">Critérios e políticas que regem o sistema</div>
+  <div class="regras-grid">
+    <div class="regra-card">
+      <div class="regra-title" style="color:var(--centro)">Critérios do Programa</div>
+      <ul class="regra-list" style="--dot: var(--centro)">
+        <li style="--before-color:var(--centro)">Elegibilidade do jovem para ingresso no programa.</li>
+        <li>Hierarquia fixa entre centros de cadastro para distribuição de vagas.</li>
+        <li>Regras de match entre jovem e vaga (perfil, área, localização).</li>
+        <li>Critérios para mudança de status (automáticos por vínculo; manuais por técnico).</li>
+        <li>Regras de encerramento e descarte do vínculo jovem-instituição. <em style="color:var(--amber)">(a definir)</em></li>
+      </ul>
+    </div>
+    <div class="regra-card">
+      <div class="regra-title" style="color:var(--entidade)">Políticas das Entidades Formadoras</div>
+      <ul class="regra-list">
+        <li>Procedimentos de acompanhamento e atualização de dados dos jovens vinculados.</li>
+        <li>Frequência e formato dos relatórios enviados ao centro de cadastro.</li>
+        <li>Canal de comunicação preferencial com o centro (já estabelecido).</li>
+        <li>Regras internas de presença, desempenho e conduta do jovem no curso.</li>
+      </ul>
+    </div>
+    <div class="regra-card">
+      <div class="regra-title" style="color:var(--empresa)">Políticas das Empresas</div>
+      <ul class="regra-list">
+        <li>Formato e periodicidade de envio de informações sobre os jovens vinculados.</li>
+        <li>Regras internas de conduta, jornada e desempenho no ambiente de trabalho.</li>
+        <li>Critérios para encerramento do contrato de aprendizagem. <em style="color:var(--amber)">(a definir com o programa)</em></li>
+        <li>Acesso limitado: apenas jovens vinculados à empresa ficam visíveis.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PERFIS -->
+<div class="perfis-section">
+  <div class="section-label">Perfis de acesso ao sistema</div>
+  <div class="perfis-grid">
+    <div class="perfil-card">
+      <div class="perfil-name" style="color:var(--centro)">Técnico — Centro de Cadastro</div>
+      <ul class="perfil-list">
+        <li>Cadastrar e editar jovens</li>
+        <li>Distribuir vagas entre centros</li>
+        <li>Realizar match jovem ↔ vaga</li>
+        <li>Alterar status do jovem (manual)</li>
+        <li>Visualizar todos os jovens do centro</li>
+        <li>Inserir dados via plataforma web</li>
+      </ul>
+    </div>
+    <div class="perfil-card">
+      <div class="perfil-name" style="color:var(--entidade)">Técnico — Entidade Formadora</div>
+      <ul class="perfil-list">
+        <li>Visualizar jovens vinculados à unidade</li>
+        <li>Atualizar informações dos jovens vinculados</li>
+        <li>Inserir dados via plataforma web</li>
+        <li class="deny">Cadastrar novos jovens</li>
+        <li class="deny">Alterar status do jovem</li>
+        <li class="deny">Acessar jovens de outras unidades</li>
+      </ul>
+    </div>
+    <div class="perfil-card">
+      <div class="perfil-name" style="color:var(--empresa)">Responsável — Empresa</div>
+      <ul class="perfil-list">
+        <li>Registrar e editar vagas</li>
+        <li>Visualizar jovens vinculados à empresa</li>
+        <li>Inserir informações sobre jovens vinculados</li>
+        <li class="deny">Selecionar ou rejeitar jovens</li>
+        <li class="deny">Alterar status do jovem</li>
+        <li class="deny">Acessar jovens de outras empresas</li>
+      </ul>
+    </div>
+    <div class="perfil-card">
+      <div class="perfil-name" style="color:var(--jovem)">Jovem</div>
+      <ul class="perfil-list">
+        <li>Enviar informações via WhatsApp (texto ou áudio)</li>
+        <li>Receber comunicados via WhatsApp</li>
+        <li class="deny">Acesso à plataforma web</li>
+        <li class="deny">Visualizar outros jovens</li>
+        <li class="deny">Alterar próprios dados</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- OPEN POINTS -->
+<div class="obs-box">
+  <div class="obs-title">⚠ Pontos em aberto</div>
+  <ul>
+    <li>Regras de encerramento e descarte do vínculo jovem-empresa ou jovem-entidade: critérios, quem inicia, o que acontece com o status.</li>
+    <li>Critérios exatos do programa para match jovem ↔ vaga: perfil, área de interesse, localização, restrições.</li>
+    <li>Periodicidade e obrigatoriedade do envio de informações pelas empresas ao centro.</li>
+  </ul>
+</div>
+
+</body>
+</html>
