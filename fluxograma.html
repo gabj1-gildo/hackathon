@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxograma — Sistema de Aprendizagem Jovem</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f4f1eb;
+    --ink: #1a1a2e;
+    --muted: #6b6b7a;
+    --surface: #ffffff;
+    --border: #d6d0c4;
+
+    --centro:   #1e6fdc;
+    --entidade: #0f9b6e;
+    --empresa:  #c47c00;
+    --jovem:    #7c3aed;
+    --sistema:  #c2185b;
+    --decision: #374151;
+
+    --centro-bg:   #e8f0fc;
+    --entidade-bg: #e6f7f1;
+    --empresa-bg:  #fef3dc;
+    --jovem-bg:    #f3eefe;
+    --sistema-bg:  #fce4ec;
+    --decision-bg: #f1f3f5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  header p {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 5px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    justify-content: center;
+    margin-bottom: 52px;
+  }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 0.73rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* FLOWCHART CONTAINER */
+  .fc {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* NODES */
+  .node {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 10px;
+    padding: 13px 20px;
+    border: 1.5px solid;
+    position: relative;
+    text-align: center;
+    transition: box-shadow 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  .node:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+
+  .node-actor {
+    font-size: 0.62rem;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .node-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .node-sub {
+    font-size: 0.72rem;
+    margin-top: 4px;
+    opacity: 0.72;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.4;
+  }
+
+  /* START / END */
+  .node-terminal {
+    border-radius: 50px;
+    max-width: 240px;
+    padding: 11px 28px;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+  .node-terminal .node-label { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em; }
+
+  /* DECISION */
+  .diamond-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    margin: 0 auto;
+  }
+  .diamond {
+    position: relative;
+    width: 220px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .diamond svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .diamond-text {
+    position: relative;
+    z-index: 2;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+    color: var(--decision);
+    padding: 0 24px;
+  }
+
+  /* ACTOR COLORS */
+  .centro   { background: var(--centro-bg);   border-color: var(--centro);   }
+  .centro   .node-actor { color: var(--centro); }
+  .entidade { background: var(--entidade-bg); border-color: var(--entidade); }
+  .entidade .node-actor { color: var(--entidade); }
+  .empresa  { background: var(--empresa-bg);  border-color: var(--empresa);  }
+  .empresa  .node-actor { color: var(--empresa); }
+  .jovem    { background: var(--jovem-bg);    border-color: var(--jovem);    }
+  .jovem    .node-actor { color: var(--jovem); }
+  .sistema  { background: var(--sistema-bg);  border-color: var(--sistema);  }
+  .sistema  .node-actor { color: var(--sistema); }
+
+  /* ARROWS */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 420px;
+    margin: 2px 0;
+  }
+  .arrow-line {
+    width: 1.5px;
+    height: 28px;
+    background: var(--border);
+  }
+  .arrow-label {
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 1px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    margin: -2px 0;
+    white-space: nowrap;
+  }
+  .arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--border);
+  }
+
+  /* BRANCH — for parallel paths */
+  .branch-wrap {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 4px 0;
+    position: relative;
+  }
+  .branch-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .branch-label {
+    font-size: 0.64rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 6px;
+    background: var(--bg);
+    padding: 2px 8px;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+  }
+  .branch-line-h {
+    height: 1.5px;
+    background: var(--border);
+    position: absolute;
+    top: 0;
+  }
+
+  /* STATUS BADGES inline */
+  .status-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 540px;
+    margin: 4px 0;
+  }
+  .sbadge {
+    font-size: 0.67rem;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    border: 1.5px solid;
+  }
+  .sb-espera   { background: #f1f3f5; color: #6b7280; border-color: #9ca3af; }
+  .sb-pre      { background: var(--centro-bg); color: var(--centro); border-color: var(--centro); }
+  .sb-aprendiz { background: var(--entidade-bg); color: var(--entidade); border-color: var(--entidade); }
+  .sb-abandono { background: #fff7ed; color: #c2460a; border-color: #f97316; }
+  .sb-removido { background: #fef2f2; color: #b91c1c; border-color: #ef4444; }
+
+  /* PHASE DIVIDERS */
+  .phase-div {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 14px;
+  }
+  .phase-div-line { flex: 1; height: 1px; background: var(--border); }
+  .phase-div-label {
+    font-size: 0.62rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* STATUS TRANSITION NOTE */
+  .trans-box {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0 0;
+    font-size: 0.73rem;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: left;
+  }
+  .trans-box strong { color: var(--ink); font-weight: 600; }
+  .trans-box .auto { color: var(--sistema); }
+  .trans-box .manual { color: var(--centro); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fluxograma — Sistema de Aprendizagem Jovem</h1>
+  <p>versão 1.2 · fluxo operacional completo</p>
+</header>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--centro)"></div>Centro de Cadastro</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--entidade)"></div>Entidade Formadora</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--empresa)"></div>Empresa</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--jovem)"></div>Jovem</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--sistema)"></div>Sistema (auto)</div>
+</div>
+
+<div class="fc">
+
+  <!-- INÍCIO -->
+  <div class="node node-terminal">
+    <div class="node-label">INÍCIO</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FASE 1 -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">01 · chegada</div><div class="phase-div-line"></div></div>
+
+  <div class="node jovem">
+    <div class="node-actor">Jovem / Família</div>
+    <div class="node-label">Procura o CREAS</div>
+    <div class="node-sub">Primeiro contato com o programa</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FASE 2 -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">02 · cadastro</div><div class="phase-div-line"></div></div>
+
+  <div class="node centro">
+    <div class="node-actor">Centro de Cadastro</div>
+    <div class="node-label">Cadastra o jovem no sistema</div>
+    <div class="node-sub">plataforma web · whatsapp (áudio → IA → texto)</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <div class="node sistema">
+    <div class="node-actor">Sistema · automático</div>
+    <div class="node-label">Atribui status: ESPERA</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FASE 3 -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">03 · vagas</div><div class="phase-div-line"></div></div>
+
+  <div class="node empresa">
+    <div class="node-actor">Empresa</div>
+    <div class="node-label">Oferta vagas no sistema</div>
+    <div class="node-sub">plataforma web · sem acesso à lista de jovens</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <div class="node centro">
+    <div class="node-actor">Centro de Cadastro</div>
+    <div class="node-label">Distribui vagas por hierarquia fixa</div>
+    <div class="node-sub">manual · Centro A &gt; Centro B · ex: 4 vagas → 3+1</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FASE 4 - DECISÃO -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">04 · match</div><div class="phase-div-line"></div></div>
+
+  <div class="node centro">
+    <div class="node-actor">Centro de Cadastro</div>
+    <div class="node-label">Seleciona jovem e realiza o match</div>
+    <div class="node-sub">critérios do programa · plataforma web</div>
+  </div>
+
+  <div class="arrow">
+    <div class="arrow-line"></div>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- DIAMOND -->
+  <div class="diamond-wrap">
+    <div class="diamond">
+      <svg viewBox="0 0 220 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="110,4 216,40 110,76 4,40" fill="#f1f3f5" stroke="#374151" stroke-width="1.5"/>
+      </svg>
+      <div class="diamond-text">Encaminha para?</div>
+    </div>
+  </div>
+
+  <!-- BRANCHES -->
+  <div class="branch-wrap" style="max-width:640px; margin-top: 8px;">
+
+    <!-- BRANCH A: Entidade Formadora -->
+    <div class="branch-col">
+      <div class="branch-label">Entidade Formadora</div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node sistema" style="max-width:100%;">
+        <div class="node-actor">Sistema · automático</div>
+        <div class="node-label">Status → PRÉ-APRENDIZAGEM</div>
+      </div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node entidade" style="max-width:100%;">
+        <div class="node-actor">Entidade Formadora</div>
+        <div class="node-label">Acompanha jovem em curso</div>
+        <div class="node-sub">atualiza dados · políticas da entidade</div>
+      </div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node centro" style="max-width:100%;">
+        <div class="node-actor">Centro de Cadastro</div>
+        <div class="node-label">Coleta informações</div>
+        <div class="node-sub">whatsapp · e-mail · telefone</div>
+      </div>
+    </div>
+
+    <!-- BRANCH B: Empresa -->
+    <div class="branch-col">
+      <div class="branch-label">Empresa</div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node sistema" style="max-width:100%;">
+        <div class="node-actor">Sistema · automático</div>
+        <div class="node-label">Status → APRENDIZAGEM</div>
+      </div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node empresa" style="max-width:100%;">
+        <div class="node-actor">Empresa</div>
+        <div class="node-label">Acompanha jovem em serviço</div>
+        <div class="node-sub">atualiza dados · políticas da empresa</div>
+      </div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node centro" style="max-width:100%;">
+        <div class="node-actor">Centro de Cadastro</div>
+        <div class="node-label">Supervisão e registro</div>
+        <div class="node-sub">whatsapp · e-mail · telefone</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONVERGEM -->
+  <div class="arrow" style="margin-top:8px;"><div class="arrow-line"></div><div class="arrow-label">convergem</div><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FASE 5: JOVEM INTERAGE -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">05 · comunicação do jovem</div><div class="phase-div-line"></div></div>
+
+  <div class="node jovem">
+    <div class="node-actor">Jovem</div>
+    <div class="node-label">Envia informações via WhatsApp</div>
+    <div class="node-sub">texto ou áudio</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-label">áudio?</div><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <div class="node sistema">
+    <div class="node-actor">Sistema · IA</div>
+    <div class="node-label">Transcrição automática de áudio</div>
+    <div class="node-sub">áudio → texto → registrado no sistema</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FASE 6: MUDANÇA DE STATUS -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">06 · mudança de status (manual)</div><div class="phase-div-line"></div></div>
+
+  <!-- DECISION: evento ocorreu? -->
+  <div class="diamond-wrap">
+    <div class="diamond">
+      <svg viewBox="0 0 220 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="110,4 216,40 110,76 4,40" fill="#f1f3f5" stroke="#374151" stroke-width="1.5"/>
+      </svg>
+      <div class="diamond-text">Mudança de situação?</div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <div class="node centro">
+    <div class="node-actor">Centro de Cadastro · exclusivo</div>
+    <div class="node-label">Altera status do jovem manualmente</div>
+    <div class="node-sub">qualquer transição é válida entre os 5 estados</div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- STATUS BADGES -->
+  <div class="status-row">
+    <span class="sbadge sb-espera">ESPERA</span>
+    <span class="sbadge sb-pre">PRÉ-APRENDIZAGEM</span>
+    <span class="sbadge sb-aprendiz">APRENDIZAGEM</span>
+    <span class="sbadge sb-abandono">ABANDONO</span>
+    <span class="sbadge sb-removido">REMOVIDO</span>
+  </div>
+
+  <div class="trans-box">
+    <strong>Transições automáticas:</strong>
+    <span class="auto"> vínculo com entidade → PRÉ-APRENDIZAGEM · vínculo com empresa → APRENDIZAGEM</span><br>
+    <strong>Transições manuais (somente centro):</strong>
+    <span class="manual"> qualquer status → qualquer status, incluindo reingresso (ABANDONO → ESPERA)</span>
+  </div>
+
+  <div class="arrow" style="margin-top:12px;"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- FIM -->
+  <div class="phase-div"><div class="phase-div-line"></div><div class="phase-div-label">encerramento</div><div class="phase-div-line"></div></div>
+
+  <!-- DECISION: encerrar? -->
+  <div class="diamond-wrap">
+    <div class="diamond">
+      <svg viewBox="0 0 220 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="110,4 216,40 110,76 4,40" fill="#f1f3f5" stroke="#374151" stroke-width="1.5"/>
+      </svg>
+      <div class="diamond-text">Encerrar vínculo?</div>
+    </div>
+  </div>
+
+  <div class="branch-wrap" style="max-width:480px; margin-top:8px;">
+    <div class="branch-col">
+      <div class="branch-label">Sim</div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node centro" style="max-width:100%;">
+        <div class="node-actor">Centro de Cadastro</div>
+        <div class="node-label">Registra encerramento</div>
+        <div class="node-sub">critérios a definir</div>
+      </div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node node-terminal" style="max-width:100%;">
+        <div class="node-label">FIM</div>
+      </div>
+    </div>
+    <div class="branch-col">
+      <div class="branch-label">Não — continua</div>
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+      <div class="node sistema" style="max-width:100%;">
+        <div class="node-actor">Sistema</div>
+        <div class="node-label">Retorna ao acompanhamento</div>
+        <div class="node-sub">↑ loop fases 04–06</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
